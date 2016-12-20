@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Pagination</title>
+  <style type="text/css">
+    .pagination li {
+      display:inline-block;
+      padding:5px;
+    }
+  </style>
+</head>
+<body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>  
+<script src="http://listjs.com/assets/javascripts/list.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.pagination.js/0.1.1/list.pagination.min.js"></script>
+  
+  <div style="display: inline">
+    <div id="total_count">
+    </div>
+    <div>
+    <h3>Click on the toggle button to start or stop the process</h3>
+      <button onclick="apiHit()" type="submit">Toggle</button>
+    </div>
+  </div>
+    
+  <div id="test-list">
+    <ul class="list">
+    </ul>
+    <ul class="pagination"></ul>
+  </div>
+
+
+<script type="text/javascript">
+
+    var interval = undefined;
+    
+    var startTimer = function () {
+      interval = setInterval(function () {
+        $.ajax({
+          type: 'GET',
+          url: 'https://api.iflychat.com/users/list/demo/c-g',
+          crossDomain: true,
+          success: function (resp) {
+            var elements = $()
+            $('.list').empty()
+            console.log(resp[resp.length-1].o)
+            $('#total_count').empty()
+            $('#total_count').append('<h2>Total count of users : ' + resp[resp.length-1].o + '</h2>')
+
+            for(var i=0; i<resp.length-1; i++) {
+              displayHtml = '<li> <p class="name"> User-id : ' + resp[i].u + ' Name : ' + resp[i].n + 'Status : ' + resp[i].s + '</p></li>'
+              elements = elements.add(displayHtml)
+            }
+            $('.list').append(elements)
+              var monkeyList = new List('test-list', {
+                valueNames: ['name'],
+                page: 10,
+                plugins: [ ListPagination({}) ] 
+            })
+          }
+        })
+      }, 1000)
+    }
+    var start = true
+
+    var stopTimer = function () {
+      if(interval) {
+        clearInterval(interval)
+      }
+    }
+
+    var apiHit = function () {
+      if(start) {
+        startTimer()
+        start = false
+      }
+      else {
+        stopTimer()
+        start = true
+      }
+    }
+
+</script>
+</body>
+</html>
